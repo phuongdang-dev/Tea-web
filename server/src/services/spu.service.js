@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes"
+import Category from "~/models/category.model"
 import SPU from "~/models/spu.model"
 import ApiError from "~/utils/ApiError"
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "~/utils/constants"
@@ -21,7 +22,6 @@ const createNew = async (data) => {
             product_tea_category: data.product_tea_category,
             product_taste: data.product_taste,
             product_effects: data.product_effects,
-            product_attribute: data.product_attribute,
             isPublished: data.isPublished
         }
 
@@ -245,11 +245,68 @@ const getRelatedProductsBySlug = async (slug, limit = 8) => {
     }
 }
 
+const getAllSpuByCategoryId = async (categoryId, page, itemsPerPage, search) => {
+    try {
+
+        const category = await Category.findOne({ category_slug: categoryId })
+        const result = await SPU.aggregate([
+            {
+                $match: { product_category: category._id }
+            },
+            {
+                $lookup: {
+                    from: "Categories",
+                    localField: "product_category",
+                    foreignField: "_id",
+                    as: "product_category"
+                }
+            },
+            {
+                $lookup: {
+                    from: "Skus",
+                    localField: "_id",
+                    foreignField: "product_id",
+                    as: "skus"
+                }
+            }, {
+                $sort: { createdAt: -1 }
+            },
+            {
+                $facet: {
+                    data: [
+                        { $skip: (page - 1) * itemsPerPage },
+                        { $limit: itemsPerPage },
+                    ],
+                    totalCount: [{ $count: "count" }],
+                },
+            },
+
+        ]).exec()
+        const spus = result[0].data.map((spu) => {
+            return {
+                ...spu,
+                product_category: spu.product_category[0] || null,
+                skus: spu.skus || [],
+            };
+        });
+        const count = result[0].totalCount[0]?.count || 0;
+        return {
+            total: count,
+            page,
+            size: spus.length,
+            data: spus,
+        };
+    } catch (error) {
+        throw error
+    }
+}
+
 export const spuService = {
     createNew,
     getAllSpu,
     getBySlug,
     deleteById,
     updateById,
-    getRelatedProductsBySlug
+    getRelatedProductsBySlug,
+    getAllSpuByCategoryId
 }

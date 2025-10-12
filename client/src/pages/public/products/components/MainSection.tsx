@@ -1,4 +1,4 @@
-import { fetchProductsAPIs } from "@/apis/product.apis";
+import { fetchProductsAPIs, fetchProductsAPIsByCategory } from "@/apis/product.apis";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger } from "@/components/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { useEffect, useState, useCallback } from "react";
@@ -9,6 +9,7 @@ import SidebarFilter from "./Sidebar";
 import Pagination from "./Pagination";
 import LoadingSpinner from "./LoadingSpinner";
 import { fetchTeaCategoryAPIs } from "@/apis/tea.category.apis";
+import { useParams } from "react-router-dom";
 
 interface FilterState {
     categories: string[];
@@ -43,18 +44,19 @@ const TeaProductsLayout = () => {
         sortBy: ""
     });
 
+    const { slug } = useParams();
+
     // Fetch initial data
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             const [productsRes, categoriesRes, tastesRes, effectsRes, teaCategoriesRes] = await Promise.all([
-                fetchProductsAPIs({ page: 1, size: 1000, search: "" }), // Fetch all products for client-side filtering
+                fetchProductsAPIsByCategory(slug, { page: 1, size: 1000, search: "" }), // Fetch all products for client-side filtering
                 fetchCategoriesAPIs(),
                 fetchTaste(),
                 fetchEffect(),
                 fetchTeaCategoryAPIs()
             ]);
-
             setTeas(productsRes.data);
             setFilteredTeas(productsRes.data);
             setTotalProducts(productsRes.total);

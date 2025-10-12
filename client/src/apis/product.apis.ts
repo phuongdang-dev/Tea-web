@@ -11,6 +11,16 @@ export const fetchProductsAPIs = async (
     return res.data;
 };
 
+export const fetchProductsAPIsByCategory = async (
+    categoryId: string,
+    params: ParamRequest
+): Promise<ApiResponse<Product[]>> => {
+    const res = await axiosCustomize.get<ApiResponse<Product[]>>("/spus/category/" + categoryId, {
+        params,
+    });
+    return res.data;
+};
+
 export const fetchProductBySlug = async (slug: string) => {
     return await axiosCustomize.get<Product>("/spus/" + slug);
 }

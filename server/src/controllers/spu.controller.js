@@ -94,11 +94,27 @@ const getRelatedProducts = async (req, res, next) => {
     }
 }
 
+const getByCategoryId = async (req, res, next) => {
+    try {
+        const { categoryId } = req.params
+        let { page, itemsPerPage, search } = req.query
+        if (!page) page = DEFAULT_PAGE
+
+        if (!itemsPerPage) itemsPerPage = DEFAULT_ITEMS_PER_PAGE
+
+        const spus = await spuService.getAllSpuByCategoryId(categoryId, page, itemsPerPage, search)
+        res.status(StatusCodes.OK).json(spus)
+    } catch (error) {
+        next(error)
+    }
+}
+
 export const spuController = {
     createNew,
     getAllSpu,
     getBySlug,
     deleteById,
     updateById,
-    getRelatedProducts
+    getRelatedProducts,
+    getByCategoryId
 }
