@@ -11,7 +11,7 @@ const createOrder = async (orderData) => {
             cart_items,
             discount_code,
             shipping_address,
-            payment_method = 'cod',
+            payment_method,
             user_id = null
         } = orderData
 
@@ -135,6 +135,11 @@ const createOrder = async (orderData) => {
         // Save order
         const savedOrder = await newOrder.save()
 
+        if (payment_method === "bank_transfer") {
+
+
+        }
+
         // Use discount if applied
         if (discountInfo.discount_id) {
             try {
@@ -154,6 +159,8 @@ const createOrder = async (orderData) => {
         throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.message)
     }
 }
+
+
 
 const getOrderById = async (orderId) => {
     try {

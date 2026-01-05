@@ -8,6 +8,8 @@ import { TeaProductDetail } from "@/pages/public/product-detail"
 import { Products } from "@/pages/public/products"
 import AddressTest from "@/pages/debug/AddressTest"
 import { Router } from "@/types/router"
+import PaymentSuccess from "@/pages/public/payment/payment-success"
+import PaymentCancel from "@/pages/public/payment/payment-cancel"
 
 export const publicRouter: Router[] = [
   {
@@ -54,4 +56,13 @@ export const publicRouter: Router[] = [
     path: "/blog/*",
     element: <BlogRoutes />,
   },
+  {
+    path: "/order/:orderId/payment-success",
+    element: <PaymentSuccess />,
+  },
+  {
+    path: "/order/:orderId/payment-cancel",
+    element: <PaymentCancel />,
+  },
+
 ]

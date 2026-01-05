@@ -3,6 +3,7 @@ import { orderController } from '~/controllers/order.controller'
 import { orderValidation } from '~/validations/order.validation'
 import { authMiddlewares } from '~/middlewares/authMiddlewares'
 import { adminMiddlewares } from '~/middlewares/adminMiddlewares'
+import { orderPaymentRoutes } from './payment'
 
 const router = express.Router()
 
@@ -130,5 +131,7 @@ router.get('/:id',
     orderValidation.validateObjectId,
     orderController.getOrderById
 )
+
+router.use("/payment", orderPaymentRoutes)
 
 export const orderRoutes = router

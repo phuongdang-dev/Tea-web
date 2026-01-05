@@ -13,6 +13,7 @@ import { toast } from 'react-toastify'
 import { getCartFromStorage, clearCart, CartItem } from "@/utils/cart"
 import { createOrderAPIs, CustomerInfo, CartItemForOrder } from "@/apis/order.apis"
 import { AddressService, Province, District, Ward } from "@/services/address.service"
+import { createPaymentLink } from '@/apis/payment.apis'
 
 interface CheckoutState {
     cartTotal: number
@@ -340,16 +341,22 @@ export default function CheckoutPage() {
                 // Clear cart after successful order
                 clearCart()
 
-                toast.success('Đặt hàng thành công!')
+                if (orderData.payment_method === 'cod') {
+                    // Redirect to order success page for COD
+                    navigate('/order-success', {
+                        state: {
+                            orderId: response.data.data.order_id,
+                            trackingNumber: response.data.data.tracking_number,
+                            total: response.data.data.total
+                        }
+                    });
+                    return;
+                } else {
+                    const paymentResponse = await createPaymentLink(response.data.data.order_id);
+                    window.location.href = paymentResponse.checkoutUrl;
+                }
 
-                // Navigate to order success page
-                navigate('/order-success', {
-                    state: {
-                        orderId: response.data.data.order_id,
-                        trackingNumber: response.data.data.tracking_number,
-                        total: response.data.data.total
-                    }
-                })
+
             }
         } catch (error: any) {
             console.error('Order creation failed:', error)
