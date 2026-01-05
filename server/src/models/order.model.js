@@ -202,8 +202,9 @@ orderSchema.virtual('formatted_tracking').get(function () {
 orderSchema.pre('save', async function (next) {
     if (this.isNew && !this.order_trackingNumber) {
         const timestamp = Date.now().toString()
-        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
-        this.order_trackingNumber = `${timestamp}${random}`
+        this.order_trackingNumber = (Date.now() + Math.floor(Math.random() * 1000))
+            .toString()
+            .slice(-8)
     }
 
     // Add status to history if status changed
@@ -219,9 +220,10 @@ orderSchema.pre('save', async function (next) {
 
 // Static method to generate next tracking number
 orderSchema.statics.generateTrackingNumber = async function () {
-    const timestamp = Date.now().toString()
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
-    return `${timestamp}${random}`
+    const timestamp = (Date.now() + Math.floor(Math.random() * 1000))
+        .toString()
+        .slice(-8)
+    return `${timestamp}`
 }
 
 const Order = model(DOCUMENT_NAME, orderSchema);

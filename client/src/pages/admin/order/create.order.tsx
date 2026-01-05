@@ -16,6 +16,7 @@ import { createOrderAPIs, createOrderByAdminAPIs } from '@/apis/order.apis'
 import shipService, { getShipConfigs } from '@/services/ship.service'
 import { ShipConfig } from '@/types/ship'
 import { toast } from 'react-toastify'
+import { fetchSingleCompanyInfoAPIs } from '@/apis/company-info.apis'
 
 // Interface cho tab đơn hàng
 
@@ -43,9 +44,14 @@ export default function CreateOrder() {
     const [showInvoiceForPrint, setShowInvoiceForPrint] = useState(false)
     const [orderTabForPrint, setOrderTabForPrint] = useState<OrderTab | null>(null)
 
+    const [trackingId, setTrackingId] = useState('')
+
     // Refs
     const searchInputRef = useRef<HTMLInputElement>(null)
     const searchContainerRef = useRef<HTMLDivElement>(null)
+
+    const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
+
 
     // Custom hook cho product search
     const {
@@ -68,7 +74,17 @@ export default function CreateOrder() {
             }
         }
         fetchDataShip()
+        fetchCompanyInfo()
     }, [])
+
+    const fetchCompanyInfo = async () => {
+        try {
+            const companyData = await fetchSingleCompanyInfoAPIs()
+            setCompanyInfo(companyData.data)
+        } catch (error) {
+            console.error('Error fetching company info:', error)
+        }
+    }
 
     const fetchDataShip = async () => {
         try {
@@ -362,6 +378,10 @@ export default function CreateOrder() {
             // Sau khi tạo đơn hàng thành công, kích hoạt in hóa đơn
             if (currentTab) {
                 setOrderTabForPrint(currentTab)
+                console.log("Tracking number:", data.data?.order_trackingNumber);
+
+                setTrackingId(data?.data?.order_trackingNumber || '');
+
                 setShowInvoiceForPrint(true)
             }
 
@@ -537,6 +557,10 @@ export default function CreateOrder() {
                     orderTab={orderTabForPrint}
                     onDownload={handlePrintSuccess}
                     setIsShowInvoice={setShowInvoiceForPrint}
+
+                    companyAddress={companyInfo?.company_address ? [companyInfo.company_name, companyInfo.company_address] : []}
+                    user={{ companyBranch: { contact: companyInfo?.company_phone || '' } }}
+                    trackingId={trackingId}
                 />
             )}
         </div>

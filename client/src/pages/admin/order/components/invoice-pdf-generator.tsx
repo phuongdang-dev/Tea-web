@@ -4,6 +4,8 @@ import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, PDFViewer, Fon
 import dayjs from "dayjs"
 import { generateBarcodeDataUrl, generateOrderUrl } from "./barcode-generator"
 import { OrderTab } from "../types"
+import shanbuLeft from "@/assets/shanbu-left.png"
+import shanbuRight from "@/assets/shanbu-right.png"
 const paddingItem = 30
 
 Font.register({
@@ -342,10 +344,11 @@ const styles = StyleSheet.create({
 
 
 // PDF Document Component
-const InvoicePDF = ({ orderTab, companyAddress, user }: {
+const InvoicePDF = ({ orderTab, companyAddress, user, trackingId }: {
   orderTab: OrderTab,
   companyAddress: string[],
-  user: any
+  user: any,
+  trackingId?: string
 }) => {
   const formatDate = (dateString?: string) => {
     const date = dateString ? new Date(dateString) : new Date()
@@ -449,9 +452,9 @@ const InvoicePDF = ({ orderTab, companyAddress, user }: {
 
   const totalAmount = calculateOrderTotal()
   const deliveryFee = 0
-  const discountAmount = 0
+  const discountAmount = orderTab?.discountAmount || 0
   const paymentDiscount = 0
-  const grandTotal = totalAmount + deliveryFee - paymentDiscount
+  const grandTotal = totalAmount + deliveryFee - discountAmount - paymentDiscount
 
   // Tạo mã vạch và URL cho đơn hàng
   const orderId = orderTab.id || orderTab.name || 'DEFAULT'
@@ -469,8 +472,8 @@ const InvoicePDF = ({ orderTab, companyAddress, user }: {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.logoSection}>
-            <Image src="/images/logo/logo-2.png" style={styles.logo} />
-            <Image src="/images/logo/logo-1.png" style={styles.logo2} />
+            <Image source={shanbuLeft} style={styles.logo} />
+            <Image source={shanbuRight} style={styles.logo2} />
           </View>
           <View style={styles.divider} />
 
@@ -485,7 +488,7 @@ const InvoicePDF = ({ orderTab, companyAddress, user }: {
                 <Text>service </Text>
                 <Text>hotline</Text>
               </View>
-              <Text style={{ fontSize: 15, fontWeight: "bold" }}>
+              <Text style={{ fontSize: 10, fontWeight: "bold" }}>
                 {user.companyBranch.contact}
               </Text>
             </View>
@@ -497,7 +500,7 @@ const InvoicePDF = ({ orderTab, companyAddress, user }: {
           <Text style={styles.invoiceTitle}>HÓA ĐƠN BÁN HÀNG</Text>
 
           <View style={styles.invoiceDetails}>
-            <Text style={styles.invoiceNumber}>{orderTab?.name || orderTab?.id}</Text>
+            <Text style={styles.invoiceNumber}>Đơn Hàng #{trackingId}</Text>
             <Text style={styles.invoiceDate}>Ngày {formatDate()}</Text>
           </View>
         </View>
@@ -518,7 +521,7 @@ const InvoicePDF = ({ orderTab, companyAddress, user }: {
               <Text style={styles.customerLabel}>Điện thoại:</Text>
               <Text style={styles.customerValue}>{orderTab.customerInfo.phone}</Text>
             </View>
-            <Text style={styles.staffInfo}>Nhân viên bán hàng: TEA SHOP STAFF </Text>
+            <Text style={styles.staffInfo}>Nhân viên bán hàng: SHANBU STAFF </Text>
           </View>
         )}
 
@@ -579,7 +582,7 @@ const InvoicePDF = ({ orderTab, companyAddress, user }: {
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel2}>GIẢM GIÁ KHÁC</Text>
-            <Text style={styles.summaryValue}>{formatCurrency(0)}</Text>
+            <Text style={styles.summaryValue}>{formatCurrency(discountAmount)}</Text>
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel2}>PHÍ GIAO HÀNG</Text>
@@ -632,7 +635,7 @@ const InvoicePDF = ({ orderTab, companyAddress, user }: {
             * Đơn hàng của quý khách sẽ được xử lý trong thời gian sớm nhất
           </Text>
           <Text style={styles.noteText}>
-            * Lưu ý: Trong trường hợp đơn hàng phát sinh thêm thời gian xử lí hoàn thiện sản phẩm, Tea Shop sẽ chủ động liên hệ thông báo tới quý khách
+            * Lưu ý: Trong trường hợp đơn hàng phát sinh thêm thời gian xử lí hoàn thiện sản phẩm, Shanbu Shop sẽ chủ động liên hệ thông báo tới quý khách
           </Text>
           <Text style={styles.noteText}>
             * Giữ lại hóa đơn để đối chiếu khi nhận hàng
@@ -655,6 +658,7 @@ interface InvoicePDFGeneratorProps {
   onDownload?: () => void,
   setIsShowInvoice?: React.Dispatch<React.SetStateAction<boolean>>,
   companyAddress?: string[]
+  trackingId?: string
   user?: any
 }
 
@@ -663,6 +667,7 @@ export default function InvoicePDFGenerator({
   onDownload,
   setIsShowInvoice,
   companyAddress = ["Tea Shop", "123 Đường ABC, Quận XYZ"],
+  trackingId,
   user = { companyBranch: { contact: "0123456789" } }
 }: InvoicePDFGeneratorProps) {
   const [isClient, setIsClient] = useState(false)
@@ -702,7 +707,7 @@ export default function InvoicePDFGenerator({
 
   return (
     <PDFDownloadLink
-      document={<InvoicePDF orderTab={orderTab} companyAddress={companyAddress} user={user} />}
+      document={<InvoicePDF orderTab={orderTab} companyAddress={companyAddress} user={user} trackingId={trackingId} />}
       fileName={`hoa-don-${orderTab?.name}.pdf`}
     >
       {({ loading, url }) => {

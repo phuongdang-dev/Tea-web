@@ -89,8 +89,26 @@ export default function ProductSearchDropdown({
                                         {product.product_category?.category_name || 'Chưa phân loại'}
                                     </p>
                                     <p className="search-result-price">
-                                        {formatPrice(product.product_basePrice)}
+                                        {product.product_basePrice > 0 ? (
+                                            formatPrice(product.product_basePrice)
+                                        ) : (
+                                            (() => {
+                                                const prices = product.product_attribute
+                                                    ?.map(attr => Number(attr.price))
+                                                    .filter(p => !isNaN(p)) || [];
+
+                                                if (prices.length === 0) return formatPrice(0);
+
+                                                const minPrice = Math.min(...prices);
+                                                const maxPrice = Math.max(...prices);
+
+                                                return minPrice === maxPrice
+                                                    ? formatPrice(minPrice)
+                                                    : `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
+                                            })()
+                                        )}
                                     </p>
+
                                 </div>
 
 

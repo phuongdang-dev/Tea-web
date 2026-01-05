@@ -51,17 +51,6 @@ export const routerNavBar: RouteNavBar[] = [
         isActive: false,
     },
     {
-        title: "Quản lý nhân viên",
-        url: "/rbac",
-        icon: UsersRound,
-        isActive: false,
-        items: [
-            {
-                title: "Quản lý nhân viên",
-                url: "/rbac/staff",
-            },
-        ],
-    }, {
         title: "Giao diện website",
         url: "/web-ui",
         icon: PencilIcon,
