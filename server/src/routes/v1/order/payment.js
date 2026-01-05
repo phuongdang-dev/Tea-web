@@ -39,4 +39,15 @@ router.post('/create-payment-link', async (req, res) => {
     }
 })
 
+
+router.post('receive-hook', async (req, res) => {
+    try {
+        console.log(req.body)
+        res.status(200).json({ message: 'success' })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: error.message })
+    }
+})
+
 export const orderPaymentRoutes = router
