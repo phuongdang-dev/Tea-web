@@ -1,5 +1,8 @@
 import { StatusCodes } from "http-status-codes"
 import { orderService } from "~/services/order.service"
+import { WEBSITE_DOMAIN } from "~/utils/constants"
+import { OrderPlacedCustomerMail } from "~/utils/format.send.email"
+import { sendEmail } from "~/utils/sendMail"
 
 const createOrder = async (req, res, next) => {
     try {
@@ -18,6 +21,13 @@ const createOrder = async (req, res, next) => {
         }
 
         const newOrder = await orderService.createOrder(orderData)
+
+        if (newOrder?.order_customer?.email) {
+            const webName = 'ShanBu'
+            const html = OrderPlacedCustomerMail(webName, WEBSITE_DOMAIN, newOrder)
+            sendEmail(webName, newOrder.order_customer.email, `Xác nhận đặt hàng #${newOrder.order_trackingNumber}`, html)
+                .catch((e) => console.error(e))
+        }
 
         res.status(StatusCodes.CREATED).json({
             success: true,

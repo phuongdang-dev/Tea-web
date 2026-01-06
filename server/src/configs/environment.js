@@ -32,6 +32,8 @@ export const env = {
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 
+  BACK_END_URL: process.env.BACK_END_URL,
+
 
   PAYOS_CLIENT_ID: process.env.PAYOS_CLIENT_ID,
   PAYOS_API_KEY: process.env.PAYOS_API_KEY,
