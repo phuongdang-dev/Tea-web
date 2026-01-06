@@ -40,9 +40,15 @@ router.post('/create-payment-link', async (req, res) => {
 })
 
 
-router.post('receive-hook', async (req, res) => {
+router.post('/receive-hook', async (req, res) => {
     try {
         console.log(req.body)
+        // const orderData = await Order.findOne({ order_trackingNumber: req.body.orderCode })
+        // if (!orderData) {
+        //     return res.status(404).json({ message: 'Order not found' })
+        // }
+        // orderData.order_payment.status = req.body.status
+        // await orderData.save()
         res.status(200).json({ message: 'success' })
     } catch (error) {
         console.error(error)

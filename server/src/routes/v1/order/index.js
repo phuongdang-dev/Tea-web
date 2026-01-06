@@ -20,6 +20,9 @@ router.post('/',
     orderController.createOrder
 )
 
+router.use("/payment", orderPaymentRoutes)
+
+
 
 router.post('/admin',
     authMiddlewares.isAuthorized,
@@ -132,6 +135,5 @@ router.get('/:id',
     orderController.getOrderById
 )
 
-router.use("/payment", orderPaymentRoutes)
 
 export const orderRoutes = router

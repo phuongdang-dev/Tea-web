@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useAppDispatch } from "@/hooks/useDispatch"
 import { logoutUserAPIs } from "@/store/slice/userSlice"
+import { useNavigate } from "react-router-dom"
 
 export function NavUser({
     user,
@@ -47,9 +48,12 @@ export function NavUser({
     const { isMobile } = useSidebar()
 
     const dispatch = useAppDispatch()
+    const navigate = useNavigate()
 
     const handleLogout = () => {
-        dispatch(logoutUserAPIs())
+        dispatch(logoutUserAPIs()).then(() => {
+            navigate('/dang-nhap', { replace: true })
+        })
     }
 
     return (

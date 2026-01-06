@@ -25,6 +25,7 @@ import { Tab } from "@/hooks/useTabManager"
 export default function DashboardLayout() {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const currentUser = useSelector(selectCurrentUser);
 
     // Initial tabs - Dashboard tab is always present and not closable
     const initialTabs: Tab[] = [
@@ -38,12 +39,11 @@ export default function DashboardLayout() {
     ];
 
     useEffect(() => {
-        dispatch(fetchUserAPIs()).then((response) => {
-            if (response.meta.requestStatus === 'rejected' || response.payload.usr_role !== 'admin') {
-                navigate("/dang-nhap")
-            }
-        })
-    }, [dispatch])
+        if (!currentUser) {
+            navigate("/dang-nhap", { replace: true })
+        }
+
+    }, [currentUser, navigate])
 
     return (
         <TabProvider initialTabs={initialTabs}>

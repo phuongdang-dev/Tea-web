@@ -100,6 +100,17 @@ const deleteUser = async (req, res, next) => {
     }
 }
 
+const logout = async (req, res, next) => {
+    try {
+        res.clearCookie('accessToken')
+        res.clearCookie('refreshToken')
+
+        res.status(StatusCodes.OK).json({ loggedOut: true })
+    } catch (error) {
+        next(error)
+    }
+}
+
 export const userController = {
     viewAnyProfile,
     register,
@@ -107,5 +118,6 @@ export const userController = {
     viewMyProfile,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    logout
 }

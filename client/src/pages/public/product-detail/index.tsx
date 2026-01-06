@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { fetchProductBySlug, fetchRelatedProducts } from "@/apis/product.apis"
 import { ProductAttribute } from "@/pages/admin/products/types/enum"
 import { toast } from "react-toastify"
@@ -54,7 +54,7 @@ export function TeaProductDetail() {
         }
     }
 
-
+    const navigate = useNavigate()
 
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat("vi-VN", {
@@ -76,6 +76,8 @@ export function TeaProductDetail() {
             toast.success(result.message)
             // Reset quantity về 1 sau khi thêm thành công
             setQuantity(1)
+
+            navigate('/gio-hang')
         } else {
             toast.error(result.message)
         }
@@ -238,11 +240,11 @@ export function TeaProductDetail() {
                     )}
 
                     <div className="flex gap-4 w-[30px]">
-                        <Button size="lg" className="flex-1" onClick={addToCart}>
+                        <Button size="lg" className="flex-1" onClick={addToCart} disabled={selectedAttribute === null}>
                             <ShoppingCart className="w-5 h-5 mr-2" />
                             Giỏ hàng
                         </Button>
-                        <Button size="lg" className="flex-1 bg-[#f57547] hover:bg-[#ff7f50]">
+                        <Button size="lg" onClick={addToCart} disabled={selectedAttribute === null} className="flex-1 bg-[#f57547] hover:bg-[#ff7f50]">
                             <ShoppingCart className="w-5 h-5 mr-2 " />
                             Mua ngay
                         </Button>
