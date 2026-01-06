@@ -198,13 +198,19 @@ orderSchema.virtual('formatted_tracking').get(function () {
     return `#${this.order_trackingNumber}`
 })
 
+function generate8DigitTrackingNumber() {
+    // Chữ số đầu: 1-9
+    const firstDigit = Math.floor(Math.random() * 9) + 1; // 1-9
+    // 7 chữ số còn lại: 0-9
+    const restDigits = Math.floor(Math.random() * 10000000)
+        .toString()
+        .padStart(7, '0'); // đảm bảo đủ 7 chữ số
+    return `${firstDigit}${restDigits}`;
+}
 // Pre-save middleware to generate tracking number
 orderSchema.pre('save', async function (next) {
     if (this.isNew && !this.order_trackingNumber) {
-        const timestamp = Date.now().toString()
-        this.order_trackingNumber = (Date.now() + Math.floor(Math.random() * 1000))
-            .toString()
-            .slice(-8)
+        this.order_trackingNumber = generate8DigitTrackingNumber();
     }
 
     // Add status to history if status changed
@@ -212,20 +218,16 @@ orderSchema.pre('save', async function (next) {
         this.status_history.push({
             status: this.order_status,
             updated_at: new Date()
-        })
+        });
     }
 
-    next()
-})
+    next();
+});
 
 // Static method to generate next tracking number
 orderSchema.statics.generateTrackingNumber = async function () {
-    const timestamp = (Date.now() + Math.floor(Math.random() * 1000))
-        .toString()
-        .slice(-8)
-    return `${timestamp}`
-}
-
+    return generate8DigitTrackingNumber();
+};
 const Order = model(DOCUMENT_NAME, orderSchema);
 
 module.exports = Order;
